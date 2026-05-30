@@ -1,4 +1,4 @@
-import { CSI, clr } from "./src/config";
+import { CSI, colors } from "./src/config";
 import { addLine, resize, tick } from "./src/simulation";
 import { render } from "./src/render";
 
@@ -7,11 +7,11 @@ if (!process.stdout.isTTY) {
   process.exit(1);
 }
 
-process.stdout.write(clr.reset + CSI + "?25l" + CSI + "2J" + CSI + "H");
+process.stdout.write(colors.reset + CSI + "?25l" + CSI + "2J" + CSI + "H");
 process.on("SIGWINCH", resize);
 
 function cleanup() {
-  process.stdout.write(clr.reset + CSI + "?25h" + CSI + "2J" + CSI + "H");
+  process.stdout.write(colors.reset + CSI + "?25h" + CSI + "2J" + CSI + "H");
   process.exit(0);
 }
 process.on("SIGINT", cleanup);

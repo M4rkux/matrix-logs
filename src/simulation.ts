@@ -1,4 +1,4 @@
-import { COL_GAP, REPEAT_GAP } from "./config";
+import { COL_GAP, DEBUG_SERVER_URL, REPEAT_GAP } from "./config";
 import type { Drop } from "./config";
 
 export let WIDTH = process.stdout.columns || 80;
@@ -9,10 +9,18 @@ export let NUM_COLS = Math.floor(WIDTH / COL_STRIDE);
 
 export const lineBuffer: string[] = [];
 
+export function log(body: string) {
+  if (!process.env.DEBUG) return;
+  fetch(`${DEBUG_SERVER_URL}/log`, { method: "POST", body });
+}
+
 export let colGrids: string[][] = Array.from({ length: NUM_COLS }, () =>
   Array<string>(HEIGHT).fill(" "),
 );
-export let drops: (Drop | null)[] = Array.from({ length: NUM_COLS }, () => null);
+export let drops: (Drop | null)[] = Array.from(
+  { length: NUM_COLS },
+  () => null,
+);
 
 function mkDrop(line: string, timerOffset = 0): Drop {
   return {
@@ -32,7 +40,9 @@ export function resize() {
   WIDTH = process.stdout.columns || 80;
   HEIGHT = process.stdout.rows || 24;
   NUM_COLS = Math.floor(WIDTH / COL_STRIDE);
-  colGrids = Array.from({ length: NUM_COLS }, () => Array<string>(HEIGHT).fill(" "));
+  colGrids = Array.from({ length: NUM_COLS }, () =>
+    Array<string>(HEIGHT).fill(" "),
+  );
   drops = Array.from({ length: NUM_COLS }, (_, lc) => {
     const line = lineBuffer[NUM_COLS - 1 - lc];
     return line !== undefined ? mkDrop(line) : null;
@@ -44,6 +54,7 @@ export function addLine(line: string) {
   if (lineBuffer.length > NUM_COLS) lineBuffer.pop();
 
   drops[NUM_COLS - 1] = mkDrop(line);
+  log(JSON.stringify(drops[NUM_COLS - 1]));
 
   for (let lc = 0; lc < NUM_COLS - 1; lc++) {
     const assigned = lineBuffer[NUM_COLS - 1 - lc];
@@ -77,7 +88,7 @@ export function tick() {
           if (grid) grid[d.head - 1] = consumeChar(d);
         }
 
-        if (d.head - d.len > HEIGHT || d.cursor >= d.line.length) {
+        if (d.head - d.len > HEIGHT || d.head > d.cursor) {
           const totalLength = d.line.length + REPEAT_GAP;
           const remaining = Math.max(0, totalLength - d.cursor);
           d.phase = "scroll";

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "bun run index.ts",
     "dev": "bun --watch run index.ts",
-    "build": "bun build ./index.ts --compile --outfile ./dist/matrix-logs"
+    "build": "bun build ./index.ts --compile --outfile ./dist/matrix-logs",
+    "debug": "DEBUG=true bun dev"
   },
   "devDependencies": {
     "@types/bun": "latest"
