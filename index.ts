@@ -1,5 +1,12 @@
-import { CSI, colors } from "./src/config";
-import { addLine, isPaused, pause, resume, resize, tick } from "./src/simulation";
+import { CSI, colors, INITIAL_FPS, MIN_FPS, MAX_FPS, FPS_STEP } from "./src/config";
+import {
+  addLine,
+  isPaused,
+  pause,
+  resume,
+  resize,
+  tick,
+} from "./src/simulation";
 import { render } from "./src/render";
 import { excuses, prefixes } from "./src/excuses";
 import { clearSession, getLastLogId, getLogsSince } from "./src/storage";
@@ -44,11 +51,24 @@ keyboard.setRawMode(true);
 keyboard.resume();
 keyboard.on("data", (chunk: Buffer) => {
   const key = chunk.toString();
-  if (key === "p" || key === "P") togglePause();
-  if (key === "+")                setFps(Math.min(MAX_FPS, fps + FPS_STEP));
-  if (key === "-")                setFps(Math.max(MIN_FPS, fps - FPS_STEP));
-  if (key === "0")                setFps(INITIAL_FPS);
-  if (key === "\x03")             process.emit("SIGINT", "SIGINT");
+  switch (key) {
+    case "p":
+    case "P":
+      togglePause();
+      break;
+    case "+":
+      setFps(Math.min(MAX_FPS, fps + FPS_STEP));
+      break;
+    case "-":
+      setFps(Math.max(MIN_FPS, fps - FPS_STEP));
+      break;
+    case "0":
+      setFps(INITIAL_FPS);
+      break;
+    case "\x03":
+      process.emit("SIGINT", "SIGINT");
+      break;
+  }
 });
 
 function cleanup() {
@@ -74,10 +94,6 @@ if (!process.stdin.isTTY) {
   for (const line of demo) addLine(line);
 }
 
-const INITIAL_FPS = 20;
-const MIN_FPS = 5;
-const MAX_FPS = 60;
-const FPS_STEP = 5;
 let fps = INITIAL_FPS;
 let intervalId: ReturnType<typeof setInterval>;
 

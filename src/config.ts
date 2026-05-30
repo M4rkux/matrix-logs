@@ -5,6 +5,11 @@ export const DEBUG_SERVER_URL =
 
 export const COL_GAP = 2;
 
+export const INITIAL_FPS = 20;
+export const MIN_FPS = 5;
+export const MAX_FPS = 60;
+export const FPS_STEP = 5;
+
 export const colors = {
   brightWhite: CSI + "1;97m",
   brightGreen: CSI + "1;32m",
