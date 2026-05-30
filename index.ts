@@ -1,4 +1,11 @@
-import { CSI, colors, INITIAL_FPS, MIN_FPS, MAX_FPS, FPS_STEP } from "./src/config";
+import {
+  CSI,
+  colors,
+  INITIAL_FPS,
+  MIN_FPS,
+  MAX_FPS,
+  FPS_STEP,
+} from "./src/config";
 import {
   addLine,
   isPaused,
@@ -14,6 +21,14 @@ import { excuses, prefixes } from "./src/excuses";
 import { clearSession, getLastLogId, getLogsSince } from "./src/storage";
 import { ReadStream } from "node:tty";
 import { openSync } from "node:fs";
+import { basename } from "node:path";
+
+const argv0 = basename(process.argv[0]!);
+const cmd = process.env.npm_lifecycle_event
+  ? `bun ${process.env.npm_lifecycle_event}`
+  : argv0 === "bun"
+    ? basename(process.argv[1]!)
+    : argv0;
 
 let excuse = excuses[(Math.random() * excuses.length) | 0];
 let prefix = prefixes[(Math.random() * prefixes.length) | 0];
@@ -96,14 +111,13 @@ if (!process.stdin.isTTY) {
   const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
   rl.on("line", addLine);
 } else {
-  const demo = [
-    "matrix-logs: pipe any command here",
-    "64 bytes from google.com: icmp_seq=1 ttl=116 time=11.2 ms",
-    "64 bytes from google.com: icmp_seq=2 ttl=116 time=10.8 ms",
-    "ping google.com | bun start",
-    "journalctl -f | bun start",
-  ];
-  for (const line of demo) addLine(line);
+  process.stdout.write(colors.reset + CSI + "?25h" + CSI + "2J" + CSI + "H");
+
+  console.log("Modo de usar:\n");
+  console.log(`  ping codecon.dev | ${cmd}`);
+  console.log(`  cat arquivo.log | ${cmd}`);
+  console.log(`  journalctl -f | ${cmd}`);
+  process.exit(0);
 }
 
 let fps = INITIAL_FPS;
