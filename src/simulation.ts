@@ -61,8 +61,10 @@ function addLineToDisplay(line: string) {
   lineBuffer.unshift(line);
   if (lineBuffer.length > NUM_COLS) lineBuffer.pop();
 
-  drops[NUM_COLS - 1] = mkDrop(line);
-  log(JSON.stringify(drops[NUM_COLS - 1]));
+  if (drops[NUM_COLS - 1] === null) {
+    drops[NUM_COLS - 1] = mkDrop(line);
+    log(JSON.stringify(drops[NUM_COLS - 1]));
+  }
 
   for (let lc = 0; lc < NUM_COLS - 1; lc++) {
     const assigned = lineBuffer[NUM_COLS - 1 - lc];
