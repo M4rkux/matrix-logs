@@ -1,8 +1,10 @@
 import { CSI, colors } from "./src/config";
-import { addLine, resize, tick } from "./src/simulation";
+import { addLine, isPaused, pause, resume, resize, tick } from "./src/simulation";
 import { render } from "./src/render";
 import { excuses, prefixes } from "./src/excuses";
-import { clearSession } from "./src/storage";
+import { clearSession, getLastLogId, getLogsSince } from "./src/storage";
+import { ReadStream } from "node:tty";
+import { openSync } from "node:fs";
 
 let excuse = excuses[(Math.random() * excuses.length) | 0];
 let prefix = prefixes[(Math.random() * prefixes.length) | 0];
@@ -24,6 +26,30 @@ if (!process.stdout.isTTY) {
 
 process.stdout.write(colors.reset + CSI + "?25l" + CSI + "2J" + CSI + "H");
 process.on("SIGWINCH", resize);
+
+let pauseStartId = 0;
+
+function togglePause() {
+  if (!isPaused) {
+    pauseStartId = getLastLogId();
+    pause();
+  } else {
+    resume(getLogsSince(pauseStartId));
+  }
+}
+
+const ttyFd = openSync("/dev/tty", "r+");
+const keyboard = new ReadStream(ttyFd);
+keyboard.setRawMode(true);
+keyboard.resume();
+keyboard.on("data", (chunk: Buffer) => {
+  const key = chunk.toString();
+  if (key === "p" || key === "P") togglePause();
+  if (key === "+")                setFps(Math.min(MAX_FPS, fps + FPS_STEP));
+  if (key === "-")                setFps(Math.max(MIN_FPS, fps - FPS_STEP));
+  if (key === "0")                setFps(INITIAL_FPS);
+  if (key === "\x03")             process.emit("SIGINT", "SIGINT");
+});
 
 function cleanup() {
   clearSession();
@@ -48,11 +74,23 @@ if (!process.stdin.isTTY) {
   for (const line of demo) addLine(line);
 }
 
-const FPS = 20;
-setInterval(
-  () => {
-    tick();
-    render();
-  },
-  (1000 / FPS) | 0,
-);
+const INITIAL_FPS = 20;
+const MIN_FPS = 5;
+const MAX_FPS = 60;
+const FPS_STEP = 5;
+let fps = INITIAL_FPS;
+let intervalId: ReturnType<typeof setInterval>;
+
+function setFps(value: number) {
+  fps = value;
+  clearInterval(intervalId);
+  intervalId = setInterval(loop, (1000 / fps) | 0);
+}
+
+function loop() {
+  if (isPaused) return;
+  tick();
+  render();
+}
+
+intervalId = setInterval(loop, (1000 / fps) | 0);

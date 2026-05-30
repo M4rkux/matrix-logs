@@ -2,6 +2,9 @@ import { COL_GAP, DEBUG_SERVER_URL } from "./config";
 import type { Drop } from "./config";
 import { insertLog } from "./storage";
 
+export let isPaused = false;
+export let isRealTime = true;
+
 export let WIDTH = process.stdout.columns || 80;
 export let HEIGHT = process.stdout.rows || 24;
 
@@ -54,8 +57,7 @@ export function resize() {
   });
 }
 
-export function addLine(line: string) {
-  insertLog(line);
+function addLineToDisplay(line: string) {
   lineBuffer.unshift(line);
   if (lineBuffer.length > NUM_COLS) lineBuffer.pop();
 
@@ -68,6 +70,23 @@ export function addLine(line: string) {
       drops[lc] = mkDrop(assigned, (Math.random() * 6) | 0);
     }
   }
+}
+
+export function addLine(line: string) {
+  insertLog(line);
+  if (isPaused) return;
+  addLineToDisplay(line);
+}
+
+export function pause() {
+  isPaused = true;
+}
+
+export function resume(missedLines: string[]) {
+  isRealTime = false;
+  isPaused = false;
+  for (const line of missedLines) addLineToDisplay(line);
+  isRealTime = true;
 }
 
 function consumeChar(d: Drop): string {

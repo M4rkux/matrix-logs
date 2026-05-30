@@ -29,3 +29,13 @@ export function insertLog(line: string) {
 export function clearSession() {
   clearStmt.run(SESSION_ID);
 }
+
+export function getLastLogId(): number {
+  const row = db.prepare("SELECT MAX(id) as id FROM logs WHERE session_id = ?").get(SESSION_ID) as { id: number | null };
+  return row?.id ?? 0;
+}
+
+export function getLogsSince(id: number): string[] {
+  const rows = db.prepare("SELECT line FROM logs WHERE session_id = ? AND id > ? ORDER BY id ASC").all(SESSION_ID, id) as { line: string }[];
+  return rows.map(r => r.line);
+}
