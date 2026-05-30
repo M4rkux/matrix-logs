@@ -17,6 +17,18 @@ ping codecon.dev | bun dev
 <img width="1200" height="600" alt="demo-mlogs" src="https://github.com/user-attachments/assets/db573220-d4bb-4949-9ee6-b82327c85417" />
 
 
+### Comandos:
+
+| Tecla | Ação |
+|-------|------|
+| `p` / `P` | Pausar / retomar a animação |
+| `h` / `H` / `←` | Navegar para logs mais antigos |
+| `l` / `L` / `→` | Navegar para logs mais recentes |
+| `+` | Aumentar a velocidade da animação |
+| `-` | Diminuir a velocidade da animação |
+| `0` | Restaurar a velocidade padrão |
+| `Ctrl+C` | Sair |
+
 ### Requisitos:
 
 - [Bun](https://bun.com)
