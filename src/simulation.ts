@@ -1,5 +1,6 @@
 import { COL_GAP, DEBUG_SERVER_URL } from "./config";
 import type { Drop } from "./config";
+import { insertLog } from "./storage";
 
 export let WIDTH = process.stdout.columns || 80;
 export let HEIGHT = process.stdout.rows || 24;
@@ -54,6 +55,7 @@ export function resize() {
 }
 
 export function addLine(line: string) {
+  insertLog(line);
   lineBuffer.unshift(line);
   if (lineBuffer.length > NUM_COLS) lineBuffer.pop();
 

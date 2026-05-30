@@ -2,6 +2,7 @@ import { CSI, colors } from "./src/config";
 import { addLine, resize, tick } from "./src/simulation";
 import { render } from "./src/render";
 import { excuses, prefixes } from "./src/excuses";
+import { clearSession } from "./src/storage";
 
 let excuse = excuses[(Math.random() * excuses.length) | 0];
 let prefix = prefixes[(Math.random() * prefixes.length) | 0];
@@ -25,6 +26,7 @@ process.stdout.write(colors.reset + CSI + "?25l" + CSI + "2J" + CSI + "H");
 process.on("SIGWINCH", resize);
 
 function cleanup() {
+  clearSession();
   process.stdout.write(colors.reset + CSI + "?25h" + CSI + "2J" + CSI + "H");
   process.exit(0);
 }
