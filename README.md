@@ -7,16 +7,15 @@ Disso aqui:
 ```sh
 ping codecon.dev
 ```
-
-<img width="1100" height="462" alt="image" src="https://github.com/user-attachments/assets/f6567c76-8b48-4541-81b5-44a3ec2effb7" />
+<img width="1200" height="600" alt="demo" src="https://github.com/user-attachments/assets/c47d95b8-b4d6-416a-9b59-0590bfd053dc" />
 
 Para isso aqui:
 
 ```
 ping codecon.dev | bun dev
 ```
+<img width="1200" height="600" alt="demo-mlogs" src="https://github.com/user-attachments/assets/cdbc3f49-16d3-45ba-8115-93ecf484b4b6" />
 
-<img width="1100" height="462" alt="image" src="https://github.com/user-attachments/assets/37ada89d-ecc2-46e2-a786-0bd1eb27592e" />
 
 ### Requisitos:
 
