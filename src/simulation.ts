@@ -47,16 +47,30 @@ function mkDrop(line: string, timerOffset = 0): Drop {
 }
 
 export function resize() {
+  const prevCols = NUM_COLS;
   WIDTH = process.stdout.columns || 80;
   HEIGHT = process.stdout.rows || 24;
   NUM_COLS = Math.floor(WIDTH / COL_STRIDE);
-  colGrids = Array.from({ length: NUM_COLS }, () =>
-    Array<string>(HEIGHT).fill(" "),
-  );
-  drops = Array.from({ length: NUM_COLS }, (_, lc) => {
+
+  // Adjust existing column grids for new HEIGHT
+  for (let lc = 0; lc < Math.min(prevCols, NUM_COLS); lc++) {
+    const grid = colGrids[lc];
+    if (grid) {
+      while (grid.length < HEIGHT) grid.push(" ");
+      grid.length = HEIGHT;
+    }
+  }
+
+  // Add columns if terminal got wider
+  for (let lc = prevCols; lc < NUM_COLS; lc++) {
+    colGrids[lc] = Array<string>(HEIGHT).fill(" ");
     const line = lineBuffer[NUM_COLS - 1 - lc];
-    return line !== undefined ? mkDrop(line) : null;
-  });
+    drops[lc] = line !== undefined ? mkDrop(line) : null;
+  }
+
+  // Trim if terminal got narrower
+  colGrids.length = NUM_COLS;
+  drops.length = NUM_COLS;
 }
 
 export function navigateLeft() {
@@ -128,8 +142,8 @@ export function pause() {
 }
 
 export function resume(missedLines: string[]) {
-  isRealTime = false;
   isPaused = false;
+  isRealTime = false;
   for (const line of missedLines) addLineToDisplay(line);
   isRealTime = true;
 }
