@@ -1,6 +1,20 @@
 import { CSI, colors } from "./src/config";
 import { addLine, resize, tick } from "./src/simulation";
 import { render } from "./src/render";
+import { excuses, prefixes } from "./src/excuses";
+
+let excuse = excuses[(Math.random() * excuses.length) | 0];
+let prefix = prefixes[(Math.random() * prefixes.length) | 0];
+const _error = console.error;
+let oldArgs: string | null = null;
+console.error = (...args: unknown[]) => {
+  if (oldArgs !== JSON.stringify(args)) {
+    excuse = excuses[(Math.random() * excuses.length) | 0];
+    prefix = prefixes[(Math.random() * prefixes.length) | 0];
+    oldArgs = JSON.stringify(args);
+  }
+  _error(...args, `\n— ${prefix}${excuse}`);
+};
 
 if (!process.stdout.isTTY) {
   console.error("stdout must be a TTY — pipe input, not output");

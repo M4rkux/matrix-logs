@@ -9,9 +9,13 @@ export let NUM_COLS = Math.floor(WIDTH / COL_STRIDE);
 
 export const lineBuffer: string[] = [];
 
-export function log(body: string) {
+export async function log(body: string) {
   if (!process.env.DEBUG) return;
-  fetch(`${DEBUG_SERVER_URL}/log`, { method: "POST", body });
+  try {
+    await fetch(`${DEBUG_SERVER_URL}/log`, { method: "POST", body });
+  } catch (e) {
+    console.error("failed to log", e);
+  }
 }
 
 export let colGrids: string[][] = Array.from({ length: NUM_COLS }, () =>
