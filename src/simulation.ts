@@ -1,4 +1,4 @@
-import { COL_GAP, DEBUG_SERVER_URL, REPEAT_GAP } from "./config";
+import { COL_GAP, DEBUG_SERVER_URL } from "./config";
 import type { Drop } from "./config";
 
 export let WIDTH = process.stdout.columns || 80;
@@ -70,8 +70,7 @@ export function addLine(line: string) {
 
 function consumeChar(d: Drop): string {
   if (d.line.length === 0) return " ";
-  const totalLength = d.line.length + REPEAT_GAP;
-  if (d.cursor >= totalLength) return " ";
+  if (d.cursor >= d.line.length) return " ";
   const pos = d.cursor++;
   return pos < d.line.length ? (d.line[d.line.length - 1 - pos] ?? " ") : " ";
 }
@@ -93,8 +92,7 @@ export function tick() {
         }
 
         if (d.head - d.len > HEIGHT || d.head > d.cursor) {
-          const totalLength = d.line.length + REPEAT_GAP;
-          const remaining = Math.max(0, totalLength - d.cursor);
+          const remaining = Math.max(0, d.line.length - d.cursor);
           d.phase = "scroll";
           d.scrollTicksLeft = remaining + HEIGHT;
           d.contentBottom = Math.min(d.line.length - 1, HEIGHT - 1);

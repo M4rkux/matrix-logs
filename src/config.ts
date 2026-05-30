@@ -1,9 +1,9 @@
 export const CSI = "\x1b[";
 
-export const DEBUG_SERVER_URL = process.env.DEBUG_SERVER_URL ?? "http://localhost:3000";
+export const DEBUG_SERVER_URL =
+  process.env.DEBUG_SERVER_URL ?? "http://localhost:3000";
 
 export const COL_GAP = 2;
-export const REPEAT_GAP = 3;
 
 export const colors = {
   brightWhite: CSI + "1;97m",
