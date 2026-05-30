@@ -1,34 +1,52 @@
 # matrix-logs
 
-### Requirements:
+A intenção deste projeto é transformar um log eficiente e sem graça em um log no estilo Matrix, não vai ficar muito legível, porém vai ficar aesthetic!
+
+Disso aqui:
+```sh
+ping codecon.dev
+```
+<img width="1100" height="462" alt="image" src="https://github.com/user-attachments/assets/f6567c76-8b48-4541-81b5-44a3ec2effb7" />
+
+
+Para isso aqui:
+```
+ping codecon.dev | bun dev
+```
+<img width="1100" height="462" alt="image" src="https://github.com/user-attachments/assets/37ada89d-ecc2-46e2-a786-0bd1eb27592e" />
+
+
+
+
+### Requisitos:
 
 - [Bun](https://bun.com)
 
-### To install dependencies:
+### Instalar dependências:
 
 ```bash
 bun install
 ```
 
-### To run:
+### Executar o projeto:
 
 ```bash
-some-command | bun dev
+comando | bun dev
 ```
 
-### To build:
+### Build:
 
 ```bash
 bun run build
 ```
 
-### To run the built binary:
+### Executar o binário:
 
 ```bash
-some-command | dist/matrix-logs
+comando | ./dist/matrix-logs
 ```
 
-## After building, add an alias to your shell config to make it easier to use:
+## Depois de buildar, adicione um alias no shell pra ficar mais fácil de usar:
 
 **zsh:**
 
