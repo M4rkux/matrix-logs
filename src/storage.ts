@@ -39,3 +39,17 @@ export function getLogsSince(id: number): string[] {
   const rows = db.prepare("SELECT line FROM logs WHERE session_id = ? AND id > ? ORDER BY id ASC").all(SESSION_ID, id) as { line: string }[];
   return rows.map(r => r.line);
 }
+
+export function getSessionLogCount(): number {
+  const row = db.prepare("SELECT COUNT(*) as count FROM logs WHERE session_id = ?").get(SESSION_ID) as { count: number };
+  return row.count;
+}
+
+// offset=0 → latest `limit` lines, offset=1 → one step older, etc.
+// Returns oldest-first so index 0 = leftmost column
+export function getLogsAtOffset(offset: number, limit: number): string[] {
+  const rows = db.prepare(
+    "SELECT line FROM logs WHERE session_id = ? ORDER BY id DESC LIMIT ? OFFSET ?"
+  ).all(SESSION_ID, limit, offset) as { line: string }[];
+  return rows.reverse().map(r => r.line);
+}

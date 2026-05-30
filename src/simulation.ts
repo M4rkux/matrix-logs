@@ -1,9 +1,11 @@
 import { COL_GAP, DEBUG_SERVER_URL } from "./config";
 import type { Drop } from "./config";
-import { insertLog } from "./storage";
+import { getLogsAtOffset, getSessionLogCount, insertLog } from "./storage";
 
 export let isPaused = false;
 export let isRealTime = true;
+export let viewOffset = 0;
+let navLines: string[] = [];
 
 export let WIDTH = process.stdout.columns || 80;
 export let HEIGHT = process.stdout.rows || 24;
@@ -57,9 +59,50 @@ export function resize() {
   });
 }
 
+export function navigateLeft() {
+  const maxOffset = Math.max(0, getSessionLogCount() - NUM_COLS);
+  if (viewOffset >= maxOffset) return;
+  viewOffset++;
+  navLines = getLogsAtOffset(viewOffset, NUM_COLS);
+
+  // Shift everything right — existing animations continue in their new slot
+  for (let lc = NUM_COLS - 1; lc > 0; lc--) {
+    drops[lc] = drops[lc - 1] ?? null;
+    colGrids[lc] = colGrids[lc - 1] ?? Array<string>(HEIGHT).fill(" ");
+  }
+
+  // Fresh column on the left for the newly revealed older line
+  const newLine = navLines[0];
+  colGrids[0] = Array<string>(HEIGHT).fill(" ");
+  drops[0] = newLine !== undefined ? mkDrop(newLine) : null;
+}
+
+export function navigateRight() {
+  if (viewOffset === 0) return;
+  viewOffset--;
+  navLines = viewOffset > 0 ? getLogsAtOffset(viewOffset, NUM_COLS) : [];
+
+  // Shift everything left — existing animations continue in their new slot
+  for (let lc = 0; lc < NUM_COLS - 1; lc++) {
+    drops[lc] = drops[lc + 1] ?? null;
+    colGrids[lc] = colGrids[lc + 1] ?? Array<string>(HEIGHT).fill(" ");
+  }
+
+  // Fresh column on the right for the newly revealed newer line
+  const source = viewOffset > 0 ? navLines : lineBuffer;
+  const newLine = source[0]; // index 0 = newest in both navLines and lineBuffer
+  colGrids[NUM_COLS - 1] = Array<string>(HEIGHT).fill(" ");
+  drops[NUM_COLS - 1] = newLine !== undefined ? mkDrop(newLine) : null;
+}
+
 function addLineToDisplay(line: string) {
   lineBuffer.unshift(line);
   if (lineBuffer.length > NUM_COLS) lineBuffer.pop();
+
+  if (viewOffset > 0) {
+    viewOffset++; // stay anchored as new lines push history back
+    return;
+  }
 
   if (drops[NUM_COLS - 1] === null) {
     drops[NUM_COLS - 1] = mkDrop(line);
@@ -131,7 +174,8 @@ export function tick() {
 
         if (--d.scrollTicksLeft <= 0) {
           colGrids[lc]?.fill(" ");
-          const nextLine = lineBuffer[NUM_COLS - 1 - lc];
+          const source = viewOffset > 0 ? navLines : lineBuffer;
+          const nextLine = source[NUM_COLS - 1 - lc];
           drops[lc] = nextLine !== undefined ? mkDrop(nextLine) : null;
         }
       }

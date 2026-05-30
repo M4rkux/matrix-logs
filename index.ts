@@ -2,6 +2,8 @@ import { CSI, colors, INITIAL_FPS, MIN_FPS, MAX_FPS, FPS_STEP } from "./src/conf
 import {
   addLine,
   isPaused,
+  navigateLeft,
+  navigateRight,
   pause,
   resume,
   resize,
@@ -64,6 +66,16 @@ keyboard.on("data", (chunk: Buffer) => {
       break;
     case "0":
       setFps(INITIAL_FPS);
+      break;
+    case "h":
+    case "H":
+    case "\x1b[D": // left arrow
+      navigateLeft();
+      break;
+    case "l":
+    case "L":
+    case "\x1b[C": // right arrow
+      navigateRight();
       break;
     case "\x03":
       process.emit("SIGINT", "SIGINT");
