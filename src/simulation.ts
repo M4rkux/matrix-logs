@@ -118,6 +118,13 @@ function addLineToDisplay(line: string) {
     return;
   }
 
+  // Update unstarted drops so rapid input (e.g. cat) stays in sync with lineBuffer
+  for (let lc = 0; lc < NUM_COLS; lc++) {
+    const d = drops[lc];
+    const assigned = lineBuffer[NUM_COLS - 1 - lc];
+    if (d != null && d.head === 0 && assigned !== undefined) d.line = assigned;
+  }
+
   if (drops[NUM_COLS - 1] === null) {
     drops[NUM_COLS - 1] = mkDrop(line);
     log(JSON.stringify(drops[NUM_COLS - 1]));
