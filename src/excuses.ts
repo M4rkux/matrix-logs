@@ -30,7 +30,6 @@ export const excuses = [
   "até o log de erro ficou sem palavras.",
   "o bug decidiu aparecer em produção.",
   "o sistema detectou excesso de confiança.",
-  "isso aí já é problema espiritual.",
   "o bug tava quieto até tu interagir.",
   `o sistema ficou sabendo que hoje é ${weekday.at(0)?.toUpperCase() + weekday.slice(1)}.`,
 ];
